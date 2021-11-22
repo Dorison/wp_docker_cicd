@@ -1,0 +1,21 @@
+version: 2.1
+jobs: 
+  build:
+    docker:
+     - image: circleci/goland:1.15
+       auth:
+         username: dorison
+         password: $DOCKERHUB_PASSWORD
+    steps:
+      - ckeckout
+
+      - setup_remote_docker:
+          version: 19.03.13
+
+      - run: | 
+          TAG=-0.1.$CIRCLE_BUID_NUM
+          docker build -t dorison/circleci-demo-docker:$TAG .
+          docker login -u dorison -p $DOCKERHUB_PASSWORD
+          docker push dorison/circleci-demo-docker:$TAG
+
+
