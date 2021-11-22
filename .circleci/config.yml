@@ -1,14 +1,19 @@
 version: 2.1
-executors:
-  my-executor:
+jobs:
+  build:
     docker:
-      - image: circleci/ruby:2.5.1-node-browsers
+      - image: circleci/goland:1.15
         auth:
           username: dorison
-          password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
+          password: $DOCKERHUB_PASSWORD
+  steps:
+    - checkout
 
-jobs:
-  my-job:
-    executor: my-executor
-    steps:
-      - run: echo outside the executor
+    - setup_remote_docker:
+        version: 19.03.13
+    
+    - run: | 
+        TAG=0.1.$CIRCLE_BUILD_NUM
+        docker build -t dorison/test:$TAG .
+        docker login -u dorison -p $DOCKERHUB_PASSWORD
+        docker push dorison/test:$TAG
